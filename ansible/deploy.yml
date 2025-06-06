@@ -1,6 +1,6 @@
 ---
 - name: Deploy Flask Monitoring Dashboard
-  hosts: your_server_ip
+  hosts: webserver
   become: yes
   vars:
     app_user: ubuntu
