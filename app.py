@@ -1,13 +1,16 @@
 from flask import Flask, render_template
 from datetime import datetime
+
 import random
 
 app = Flask(__name__)
 
-# Mock DevOps journey metrics
+# DevOps journey started in February 2025
+START_DATE = datetime(2025, 2, 1)
+
 def get_devops_metrics():
     return {
-        "days_learning": (datetime.now() - datetime(2024, 1, 1)).days,
+        "days_learning": (datetime.now() - START_DATE).days,
         "containers_launched": random.randint(50, 200),
         "servers_configured": random.randint(10, 50),
         "terraform_wins": random.randint(5, 20),

@@ -1,99 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DevOps Quest</title>
+    <title>DevOps Dashboard</title>
     <style>
         :root {
-            --neon-green: #0f0;
-            --neon-pink: #f0f;
-            --neon-blue: #0ff;
-            --dark-bg: #111;
+            --soft-blue: #a3c4f3;
+            --soft-green: #b9fbc0;
+            --soft-pink: #ffc9de;
+            --soft-yellow: #fff3b0;
+            --soft-purple: #d3c4f3;
+            --bg-color: #fefefe;
+            --text-color: #333;
         }
+
         body {
-            background: var(--dark-bg);
-            color: var(--neon-green);
-            font-family: 'Courier New', monospace;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
-            border: 2px dashed var(--neon-pink);
-            padding: 20px;
-            animation: glow 2s infinite alternate;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 30px;
         }
+
         h1 {
-            color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue);
+            color: var(--soft-purple);
             text-align: center;
+            margin-bottom: 20px;
         }
+
         .metric {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px;
+            background: var(--soft-blue);
+            padding: 15px;
             margin: 10px 0;
-            border-left: 3px solid var(--neon-green);
-            animation: fadeIn 1s;
+            border-left: 5px solid var(--soft-green);
+            border-radius: 6px;
+            transition: background 0.3s;
         }
+
+        .metric:hover {
+            background: var(--soft-yellow);
+        }
+
         .metric-value {
-            color: var(--neon-pink);
             font-weight: bold;
+            color: var(--soft-pink);
         }
-        @keyframes glow {
-            from { box-shadow: 0 0 10px var(--neon-green); }
-            to { box-shadow: 0 0 20px var(--neon-blue); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 DevOps Quest Dashboard</h1>
+        <h1>🌸 My DevOps Monitoring Dashboard</h1>
         <p>Last updated: <span class="metric-value">{{ metrics.last_updated }}</span></p>
-        
+
         <div class="metric">
-            <span>Days Learning DevOps:</span>
+            Days Learning DevOps:
             <span class="metric-value">{{ metrics.days_learning }} days</span>
         </div>
-        
+
         <div class="metric">
-            <span>Containers Launched:</span>
+            Containers Launched:
             <span class="metric-value">{{ metrics.containers_launched }} 🐳</span>
         </div>
-        
+
         <div class="metric">
-            <span>Servers Configured:</span>
+            Servers Configured:
             <span class="metric-value">{{ metrics.servers_configured }} 🖥️</span>
         </div>
-        
+
         <div class="metric">
-            <span>Terraform Wins:</span>
+            Terraform Wins:
             <span class="metric-value">{{ metrics.terraform_wins }} ⚡</span>
         </div>
-        
+
         <div class="metric">
-            <span>Last CI/CD Fail:</span>
+            Last CI/CD Fail:
             <span class="metric-value">{{ metrics.last_cicd_fail }} 😅</span>
         </div>
-        
+
         <div class="metric">
-            <span>Current Quest:</span>
+            Current Quest:
             <span class="metric-value">{{ metrics.current_quest }} 🔥</span>
         </div>
-    </div>
 
-    <script>
-        // Fun terminal-like typing effect
-        const metrics = document.querySelectorAll('.metric');
-        metrics.forEach((metric, i) => {
-            setTimeout(() => {
-                metric.style.opacity = 1;
-            }, i * 200);
-        });
-    </script>
+        <div class="footer">✨ Deployed with Ansible, Nginx, and Gunicorn ✨</div>
+    </div>
 </body>
 </html>
