@@ -107,8 +107,26 @@
       loop:
         - { path: "{{ app_dir }}", mode: "0755" }
         - { path: "{{ sock_file }}", mode: "0660" }
-      when: item.path == app_dir or (item.path == sock_file and stat(sock_file).exists)
-      ignore_errors: yes
+    
+    - name: Check if socket exists
+      stat:
+        path: "{{ sock_file }}"
+      register: sock_stat
+
+    - name: Set directory permissions
+      file:
+        path: "{{ app_dir }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0755"
+
+    - name: Set socket permissions (if exists)
+      file:
+        path: "{{ sock_file }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0660"
+      when: sock_stat.stat.exists
  
   handlers:
     - name: restart gunicorn
