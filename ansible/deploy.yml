@@ -68,7 +68,7 @@
 
     - name: Create systemd service for Gunicorn
       template:
-        src: ansible/templates/gunicorn.service.j2
+        src: templates/gunicorn.service.j2
         dest: /etc/systemd/system/flaskapp.service
         mode: '0644'
       notify:
@@ -76,7 +76,7 @@
 
     - name: Create Nginx config
       template:
-        src: ansible/templates/nginx.conf.j2
+        src: templates/nginx.conf.j2
         dest: /etc/nginx/sites-available/flaskapp
         mode: '0644'
       notify:
