@@ -73,6 +73,7 @@
         mode: '0644'
       notify:
         - restart gunicorn
+        - Set socket permissions
 
     - name: Create Nginx config
       template:
@@ -106,13 +107,23 @@
       loop:
         - { path: "{{ app_dir }}", mode: "0755" }
         - { path: "{{ sock_file }}", mode: "0660" }
-
+      when: item.path == app_dir or (item.path == sock_file and stat(sock_file).exists)
+      ignore_errors: yes
+ 
   handlers:
     - name: restart gunicorn
       systemd:
         name: flaskapp
         state: restarted
         daemon_reload: yes
+
+    - name: Set socket permissions
+      file:
+        path: "{{ sock_file }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0660"
+      when: stat(sock_file).exists
 
     - name: restart nginx
       systemd:
