@@ -4,6 +4,6 @@ server {
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:{{ sock_file }};
+        proxy_pass http://unix:/home/ubuntu/flaskapp/flaskapp.sock;
     }
 }
