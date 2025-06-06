@@ -5,8 +5,8 @@
   vars:
     app_user: ubuntu
     app_group: www-data
-    repo_url: "https://github.com/joannedada/flaskapp.git"  # ← Your GitHub repo
-    branch: dev                                              # ← Your branch
+    repo_url: "https://github.com/joannedada/flaskapp.git"
+    branch: dev
     app_dir: /home/{{ app_user }}/flaskapp
     venv_dir: "{{ app_dir }}/venv"
     sock_file: "{{ app_dir }}/flaskapp.sock"
@@ -23,7 +23,7 @@
         - libssl-dev
         - libffi-dev
         - nginx
-        - git  # ← Required for GitHub cloning
+        - git
 
     - name: Clone GitHub repository
       git:
@@ -34,24 +34,29 @@
       notify:
         - restart gunicorn
 
-    - name: Ensure correct permissions (Critical for Gunicorn+Nginx)
+    - name: Ensure correct permissions
       file:
         path: "{{ app_dir }}"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: '0755'
-        recurse: yes  # Applies to all files
+        recurse: yes
 
     - name: Create virtual environment
       command: "python3 -m venv {{ venv_dir }}"
       args:
         creates: "{{ venv_dir }}"
 
+    - name: Check if requirements.txt exists
+      stat:
+        path: "{{ app_dir }}/requirements.txt"
+      register: requirements_stat
+
     - name: Install Python packages from requirements.txt
       pip:
         requirements: "{{ app_dir }}/requirements.txt"
         virtualenv: "{{ venv_dir }}"
-      when: "'requirements.txt' in lookup('file', app_dir)"
+      when: requirements_stat.stat.exists
 
     - name: Install Gunicorn and Flask directly if no requirements.txt
       pip:
@@ -59,7 +64,7 @@
           - gunicorn
           - flask
         virtualenv: "{{ venv_dir }}"
-      when: not requirements_stat.exists
+      when: not requirements_stat.stat.exists
 
     - name: Create systemd service for Gunicorn
       template:
@@ -100,16 +105,16 @@
         mode: "{{ item.mode }}"
       loop:
         - { path: "{{ app_dir }}", mode: "0755" }
-        - { path: "{{ sock_file }}", mode: "0660" }  # Socket permissions
+        - { path: "{{ sock_file }}", mode: "0660" }
 
-      handlers:
-      - name: restart gunicorn
-        systemd:
-          name: flaskapp
-          state: restarted
-          daemon_reload: yes
+  handlers:
+    - name: restart gunicorn
+      systemd:
+        name: flaskapp
+        state: restarted
+        daemon_reload: yes
 
-      - name: restart nginx
-        systemd:
-          name: nginx
-          state: restarted
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
