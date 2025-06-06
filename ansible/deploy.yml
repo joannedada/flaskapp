@@ -98,6 +98,11 @@
       notify:
         - restart nginx
 
+    - name: Check if socket exists
+      stat:
+        path: "{{ sock_file }}"
+      register: sock_stat
+
     - name: Ensure proper permissions
       file:
         path: "{{ item.path }}"
@@ -107,11 +112,8 @@
       loop:
         - { path: "{{ app_dir }}", mode: "0755" }
         - { path: "{{ sock_file }}", mode: "0660" }
-    
-    - name: Check if socket exists
-      stat:
-        path: "{{ sock_file }}"
-      register: sock_stat
+      when: item.path == app_dir or (item.path == sock_file and sock_stat.stat.exists)
+      ignore_errors: yes
 
     - name: Set directory permissions
       file:
@@ -119,14 +121,6 @@
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: "0755"
-
-    - name: Set socket permissions (if exists)
-      file:
-        path: "{{ sock_file }}"
-        owner: "{{ app_user }}"
-        group: "{{ app_group }}"
-        mode: "0660"
-      when: sock_stat.stat.exists
  
   handlers:
     - name: restart gunicorn
