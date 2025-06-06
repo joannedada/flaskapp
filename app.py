@@ -1,25 +1,25 @@
+from flask import Flask, render_template
+from datetime import datetime
+import random
 
-from flask import Flask
 app = Flask(__name__)
+
+# Mock DevOps journey metrics
+def get_devops_metrics():
+    return {
+        "days_learning": (datetime.now() - datetime(2024, 1, 1)).days,
+        "containers_launched": random.randint(50, 200),
+        "servers_configured": random.randint(10, 50),
+        "terraform_wins": random.randint(5, 20),
+        "last_cicd_fail": f"{random.randint(0, 7)} days ago",
+        "current_quest": "Kubernetes Mastery",
+        "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
 
 @app.route('/')
 def dashboard():
-    return '''
-    <html>
-        <head>
-            <title>CEEYIT Dashboard</title>
-            <style>
-                body { font-family: Arial; background: #fefefe; text-align: center; margin-top: 100px; }
-                h1 { color: #2a9d8f; }
-                p { font-size: 18px; color: #264653; }
-            </style>
-        </head>
-        <body>
-            <h1>CEEYIT Monitoring Dashboard</h1>
-            <p>Your DevOps metrics will be visualized here.</p>
-        </body>
-    </html>
-    '''
+    metrics = get_devops_metrics()
+    return render_template('dashboard.html', metrics=metrics)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)

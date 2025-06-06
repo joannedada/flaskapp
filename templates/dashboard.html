@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DevOps Quest</title>
+    <style>
+        :root {
+            --neon-green: #0f0;
+            --neon-pink: #f0f;
+            --neon-blue: #0ff;
+            --dark-bg: #111;
+        }
+        body {
+            background: var(--dark-bg);
+            color: var(--neon-green);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px dashed var(--neon-pink);
+            padding: 20px;
+            animation: glow 2s infinite alternate;
+        }
+        h1 {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px var(--neon-blue);
+            text-align: center;
+        }
+        .metric {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid var(--neon-green);
+            animation: fadeIn 1s;
+        }
+        .metric-value {
+            color: var(--neon-pink);
+            font-weight: bold;
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 10px var(--neon-green); }
+            to { box-shadow: 0 0 20px var(--neon-blue); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DevOps Quest Dashboard</h1>
+        <p>Last updated: <span class="metric-value">{{ metrics.last_updated }}</span></p>
+        
+        <div class="metric">
+            <span>Days Learning DevOps:</span>
+            <span class="metric-value">{{ metrics.days_learning }} days</span>
+        </div>
+        
+        <div class="metric">
+            <span>Containers Launched:</span>
+            <span class="metric-value">{{ metrics.containers_launched }} 🐳</span>
+        </div>
+        
+        <div class="metric">
+            <span>Servers Configured:</span>
+            <span class="metric-value">{{ metrics.servers_configured }} 🖥️</span>
+        </div>
+        
+        <div class="metric">
+            <span>Terraform Wins:</span>
+            <span class="metric-value">{{ metrics.terraform_wins }} ⚡</span>
+        </div>
+        
+        <div class="metric">
+            <span>Last CI/CD Fail:</span>
+            <span class="metric-value">{{ metrics.last_cicd_fail }} 😅</span>
+        </div>
+        
+        <div class="metric">
+            <span>Current Quest:</span>
+            <span class="metric-value">{{ metrics.current_quest }} 🔥</span>
+        </div>
+    </div>
+
+    <script>
+        // Fun terminal-like typing effect
+        const metrics = document.querySelectorAll('.metric');
+        metrics.forEach((metric, i) => {
+            setTimeout(() => {
+                metric.style.opacity = 1;
+            }, i * 200);
+        });
+    </script>
+</body>
+</html>

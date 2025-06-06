@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn instance for Flask
+After=network.target
+
+[Service]
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_dir }}
+Environment="PATH={{ venv_dir }}/bin"
+ExecStart={{ venv_dir }}/bin/gunicorn \
+          --workers 3 \
+          --bind unix:{{ sock_file }} \
+          --umask 007 \  # Ensures socket gets 660 permissions
+          wsgi:app
+
+[Install]
+WantedBy=multi-user.target

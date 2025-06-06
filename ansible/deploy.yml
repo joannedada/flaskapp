@@ -1,0 +1,115 @@
+---
+- name: Deploy Flask Monitoring Dashboard
+  hosts: your_server_ip
+  become: yes
+  vars:
+    app_user: ubuntu
+    app_group: www-data
+    repo_url: "https://github.com/joannedada/flaskapp.git"  # ← Your GitHub repo
+    branch: dev                                              # ← Your branch
+    app_dir: /home/{{ app_user }}/flaskapp
+    venv_dir: "{{ app_dir }}/venv"
+    sock_file: "{{ app_dir }}/flaskapp.sock"
+
+  tasks:
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - python3-pip
+        - python3-venv
+        - build-essential
+        - libssl-dev
+        - libffi-dev
+        - nginx
+        - git  # ← Required for GitHub cloning
+
+    - name: Clone GitHub repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ branch }}"
+        force: yes
+      notify:
+        - restart gunicorn
+
+    - name: Ensure correct permissions (Critical for Gunicorn+Nginx)
+      file:
+        path: "{{ app_dir }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+        recurse: yes  # Applies to all files
+
+    - name: Create virtual environment
+      command: "python3 -m venv {{ venv_dir }}"
+      args:
+        creates: "{{ venv_dir }}"
+
+    - name: Install Python packages from requirements.txt
+      pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ venv_dir }}"
+      when: "'requirements.txt' in lookup('file', app_dir)"
+
+    - name: Install Gunicorn and Flask directly if no requirements.txt
+      pip:
+        name:
+          - gunicorn
+          - flask
+        virtualenv: "{{ venv_dir }}"
+      when: not requirements_stat.exists
+
+    - name: Create systemd service for Gunicorn
+      template:
+        src: ansible/templates/gunicorn.service.j2
+        dest: /etc/systemd/system/flaskapp.service
+        mode: '0644'
+      notify:
+        - restart gunicorn
+
+    - name: Create Nginx config
+      template:
+        src: ansible/templates/nginx.conf.j2
+        dest: /etc/nginx/sites-available/flaskapp
+        mode: '0644'
+      notify:
+        - restart nginx
+
+    - name: Enable Nginx site
+      file:
+        src: /etc/nginx/sites-available/flaskapp
+        dest: /etc/nginx/sites-enabled/flaskapp
+        state: link
+      notify:
+        - restart nginx
+
+    - name: Remove default Nginx site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify:
+        - restart nginx
+
+    - name: Ensure proper permissions
+      file:
+        path: "{{ item.path }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "{{ app_dir }}", mode: "0755" }
+        - { path: "{{ sock_file }}", mode: "0660" }  # Socket permissions
+
+      handlers:
+      - name: restart gunicorn
+        systemd:
+          name: flaskapp
+          state: restarted
+          daemon_reload: yes
+
+      - name: restart nginx
+        systemd:
+          name: nginx
+          state: restarted
